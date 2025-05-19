@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ML Experiments</title>
+    <style>
+        :root {
+            --primary-color: #5fb9f5;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .program-container {
+            background-color: var(--card-bg);
+            color: #abb2bf;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            position: relative;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .program-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .program-container h2 {
+            color: var(--secondary-color);
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        pre {
+            margin: 15px 0;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            white-space: pre;
+            tab-size: 4;
+            overflow-x: auto;
+            padding: 15px;
+            background-color: #282c34;
+            border-radius: var(--border-radius);
+            position: relative;
+            line-height: 1.5;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .copy-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        .copy-btn::before {
+            content: "📋";
+        }
+
+        .copy-btn.copied::before {
+            content: "✓";
+        }
+
+        @media (max-width: 768px) {
+            .program-container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Syntax highlighting for code */
+        .keyword { color: #c678dd; }
+        .header { color: #e06c75; }
+        .string { color: #98c379; }
+        .comment { color: #5c6370; font-style: italic; }
+        .number { color: #d19a66; }
+        .operator { color: #56b6c2; }
+
+        footer {
+            background-color: #1e1e1e;
+            color: #ffffff;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 24px;
+            font-weight: 800;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+
+        footer .highlight {
+            color: #35b5a0;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Compiler Design Experiments</h1>
+
+    <!-- Experiment 1 -->
+    <div class="program-container">
+        <h2>DecisionTree</h2>
+        <button class="copy-btn" onclick="copyCode('code1')">Copy Code</button>
+        <pre id="code1">import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
+
+data = {
+    'Age': [22, 25, 47, 52, 46, 56],
+    'Income': ['Low', 'High', 'Medium', 'Medium', 'Low', 'High'],
+    'Student': ['No', 'No', 'Yes', 'Yes', 'No', 'Yes'],
+    'Buys_Computer': ['No', 'No', 'Yes', 'Yes', 'No', 'Yes']
+}
+
+df = pd.DataFrame(data)
+
+X = pd.get_dummies(df.drop(columns='Buys_Computer'))
+y = df['Buys_Computer']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+model = DecisionTreeClassifier()
+model.fit(X_train, y_train)
+
+print("Enter values for: Age, Income (Low/Medium/High), Student (Yes/No)")
+age = input("Age: ")
+income = input("Income (Low/Medium/High): ")
+student = input("Student (Yes/No): ")
+
+user_data = pd.DataFrame([{
+    'Age': float(age),
+    'Income': income,
+    'Student': student
+}])
+
+user_data_encoded = pd.get_dummies(user_data)
+user_data_encoded = user_data_encoded.reindex(columns=X.columns, fill_value=0)
+
+prediction = model.predict(user_data_encoded)
+print("Prediction:", prediction[0])
+
+accuracy = accuracy_score(y_test, model.predict(X_test))
+print("Model accuracy:", round(accuracy * 100, 2), "%")
+
+plt.figure(figsize=(20, 10))
+plot_tree(model, feature_names=X.columns, class_names=[str(c) for c in model.classes_], filled=True)
+plt.title("Decision Tree Visualization")
+plt.show()</pre>
+    </div>
+
+    <!-- Experiment 2 -->
+    <div class="program-container">
+        <h2>Genetic</h2>
+        <button class="copy-btn" onclick="copyCode('code2')">Copy Code</button>
+        <pre id="code2">import random
+
+def generate_population(pop_size, gene_length):
+    return [[random.randint(0, 1) for _ in range(gene_length)] for _ in range(pop_size)]
+
+def fitness(individual):
+    return sum(individual)
+
+def tournament_selection(population, k=3):
+    selected = random.sample(population, k)
+    selected.sort(key=fitness, reverse=True)
+    return selected[0]
+
+if __name__ == "__main__":
+    pop_size = 5
+    gene_length = 6
+
+    population = generate_population(pop_size, gene_length)
+    print("Generated Population with Fitness:")
+    for i, individual in enumerate(population, 1):
+        print(f"Individual {i}: {individual} -> Fitness: {fitness(individual)}")
+
+    selected = tournament_selection(population, k=3)
+    print("\nSelected Individual (Tournament):", selected)
+    print("Selected Fitness:", fitness(selected))
+
+import random
+
+def single_point_crossover(p1, p2):
+    point = random.randint(1, len(p1) - 1)
+    return p1[:point] + p2[point:], p2[:point] + p1[point:]
+
+def multi_point_crossover(p1, p2, points=2):
+    if points >= len(p1):
+        raise ValueError("Too many crossover points")
+    crossover_points = sorted(random.sample(range(1, len(p1)), points))
+    child1, child2 = [], []
+    toggle = False
+    prev = 0
+    for point in crossover_points + [len(p1)]:
+        if toggle:
+            child1 += p2[prev:point]
+            child2 += p1[prev:point]
+        else:
+            child1 += p1[prev:point]
+            child2 += p2[prev:point]
+        toggle = not toggle
+        prev = point
+    return child1, child2
+
+def uniform_crossover(p1, p2, swap_prob=0.5):
+    child1, child2 = [], []
+    for gene1, gene2 in zip(p1, p2):
+        if random.random() < swap_prob:
+            child1.append(gene2)
+            child2.append(gene1)
+        else:
+            child1.append(gene1)
+            child2.append(gene2)
+    return child1, child2
+
+if __name__ == "__main__":
+    p1 = [1, 1, 1, 1, 1, 1]
+    p2 = [0, 0, 0, 0, 0, 0]
+
+    print("Parent 1:", p1)
+    print("Parent 2:", p2)
+
+    c1, c2 = single_point_crossover(p1, p2)
+    print("\nSingle-Point Crossover:")
+    print("Child1:", c1)
+    print("Child2:", c2)
+
+    c1, c2 = multi_point_crossover(p1, p2, points=3)
+    print("\nMulti-Point Crossover:")
+    print("Child1:", c1)
+    print("Child2:", c2)
+
+    c1, c2 = uniform_crossover(p1, p2)
+    print("\nUniform Crossover:")
+    print("Child1:", c1)
+    print("Child2:", c2)
+
+import random
+
+def bit_flip_mutation(individual, mutation_rate=0.05):
+    mutated_individual = []
+    for gene in individual:
+        rand_val = random.random()
+        if rand_val > mutation_rate:
+            mutated_individual.append(gene)
+        else:
+            flipped_gene = 1 - gene
+            mutated_individual.append(flipped_gene)
+    return mutated_individual
+
+if __name__ == "__main__":
+    ind = [1, 0, 1, 0, 1, 0]
+    print("Before:", ind)
+    print("After :", bit_flip_mutation(ind, 0.3))</pre>
+    </div>
+
+    <!-- Experiment 3 -->
+    <div class="program-container">
+        <h2>KMeans</h2>
+        <button class="copy-btn" onclick="copyCode('code3')">Copy Code</button>
+        <pre id="code3">import pandas as pd
+import numpy as np
+from sklearn.cluster import KMeans
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+data = pd.DataFrame({
+    'id': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    'Annual_Income': [15, 16, 17, 18, 19, 80, 85, 90, 95, 100],
+    'Spending_Score': [39, 81, 6, 77, 40, 60, 50, 88, 80, 42]
+}).set_index('id')
+
+print(data)
+
+n_clusters = int(input("No of Clusters: "))
+
+kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+kmeans.fit(data)
+
+print("\nCluster Centers:\n", kmeans.cluster_centers_)
+
+data['cluster'] = kmeans.labels_
+
+print(data)
+unique, counts = np.unique(kmeans.labels_, return_counts=True)
+cluster_counts = dict(zip(unique, counts))
+print("Cluster Counts:", cluster_counts)
+
+x_col, y_col = data.columns[0], data.columns[1]
+sns.lmplot(
+    x=x_col,
+    y=y_col,
+    data=data,
+    hue='cluster',
+    palette='coolwarm',
+    height=6,
+    aspect=1,
+    fit_reg=False
+)
+plt.title('KMeans Cluster Graph')
+plt.show()
+
+print("KMeans inertia:", kmeans.inertia_)
+
+print("KMeans score:", kmeans.score(data.drop(columns=['cluster'])))</pre>
+    </div>
+
+    <!-- Experiment 4 -->
+    <div class="program-container">
+        <h2>KNN</h2>
+        <button class="copy-btn" onclick="copyCode('code4')">Copy Code</button>
+        <pre id="code4">import pandas as pd
+import numpy as np
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+def main():
+    data = {
+        'Age': [22, 25, 47, 52, 46, 56, 23, 40, 36, 28],
+        'Income': ['Low', 'High', 'Medium', 'Medium', 'Low', 'High', 'Low', 'Medium', 'High', 'Low'],
+        'Student': ['No', 'No', 'Yes', 'Yes', 'No', 'Yes', 'Yes', 'No', 'No', 'Yes'],
+        'Buys_Computer': ['No', 'No', 'Yes', 'Yes', 'No', 'Yes', 'No', 'Yes', 'Yes', 'No']
+    }
+    df = pd.DataFrame(data)
+
+    target_col = 'Buys_Computer'
+    X = df.drop(columns=[target_col])
+    y = df[target_col]
+
+    X = pd.get_dummies(X)
+
+    k = int(input("Enter value of K for K-NN: "))
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+    model = KNeighborsClassifier(n_neighbors=k)
+    model.fit(X_train, y_train)
+
+    print("Enter values for: Age, Income (Low/Medium/High), Student (Yes/No)")
+    age = input("Age: ")
+    income = input("Income (Low/Medium/High): ")
+    student = input("Student (Yes/No): ")
+
+    user_data = pd.DataFrame([{
+        'Age': float(age),
+        'Income': income,
+        'Student': student
+    }])
+    user_df = pd.get_dummies(user_data)
+
+    user_df = user_df.reindex(columns=X.columns, fill_value=0)
+
+    prediction = model.predict(user_df)
+    print("K-NN Prediction:", prediction[0])
+
+    print("Accuracy on test set:", accuracy_score(y_test, model.predict(X_test)))
+
+if __name__ == "__main__":
+    main()</pre>
+    </div>
+
+    <!-- Experiment 5 -->
+    <div class="program-container">
+        <h2>LinearRegression</h2>
+        <button class="copy-btn" onclick="copyCode('code5')">Copy Code</button>
+        <pre id="code5">import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
+import matplotlib.pyplot as plt  
+
+data = {
+    "Area": [1200, 1500, 800, 1100, 1600, 1000, 1400, 900],
+    "Location": ["Suburb", "City", "Village", "Suburb", "City", "Village", "City", "Suburb"],
+    "Bedrooms": [3, 4, 2, 3, 4, 2, 3, 2],
+    "Price": [200000, 300000, 100000, 180000, 320000, 120000, 280000, 150000]
+}
+
+df = pd.DataFrame(data)
+df = df.dropna()
+
+print("Columns:", list(df.columns))
+target = input("Enter target column (e.g., Price): ")
+
+X_raw = df.drop(columns=[target])
+y = df[target]
+
+X = pd.get_dummies(X_raw)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+print("\nEnter values for prediction:")
+area = int(input("Enter Area (e.g., 1300): "))
+location = input("Enter Location (City/Suburb/Village): ")
+bedrooms = int(input("Enter number of Bedrooms: "))
+
+input_df = pd.DataFrame({
+    "Area": [area],
+    "Location": [location],
+    "Bedrooms": [bedrooms]
+})
+
+input_encoded = pd.get_dummies(input_df)
+input_encoded = input_encoded.reindex(columns=X.columns, fill_value=0)
+
+predicted_price = model.predict(input_encoded)[0]
+print(f"\nPredicted {target}: {predicted_price:.2f}")
+
+y_pred = model.predict(X_test)
+print(f"R^2 score on test data: {r2_score(y_test, y_pred):.4f}")
+
+plt.scatter(y_test, y_pred)
+plt.xlabel("Actual Prices")
+plt.ylabel("Predicted Prices")
+plt.title("Actual vs Predicted Prices")
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--')
+plt.show()</pre>
+    </div>
+
+    <!-- Experiment 6 -->
+    <div class="program-container">
+        <h2>NaiveBayes</h2>
+        <button class="copy-btn" onclick="copyCode('code6')">Copy Code</button>
+        <pre id="code6">import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score
+
+data = {
+    "Age": ["Low", "Medium", "High", "Medium", "Low", "High", "Low", "Medium"],
+    "Salary": ["Low", "Medium", "High", "High", "Low", "High", "Low", "Medium"],
+    "Purchased": ["No", "Yes", "Yes", "Yes", "No", "Yes", "No", "Yes"]
+}
+
+df = pd.DataFrame(data)
+
+target = "Purchased"
+
+X_raw = df.drop(columns=[target])
+y = df[target]
+
+X = pd.get_dummies(X_raw)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+model = GaussianNB()
+model.fit(X_train, y_train)
+
+print("\nEnter values for prediction:")
+age = input("Enter Age (Low/Medium/High): ")
+salary = input("Enter Salary (Low/Medium/High): ")
+
+input_df = pd.DataFrame({
+    "Age": [age],
+    "Salary": [salary]
+})
+
+input_encoded = pd.get_dummies(input_df)
+input_encoded = input_encoded.reindex(columns=X.columns, fill_value=0)
+
+prediction = model.predict(input_encoded)
+print("\nPredicted category:", prediction[0])
+
+print("Accuracy on test set:", accuracy_score(y_test, model.predict(X_test)))</pre>
+    </div>
+
+    <!-- Experiment 7 -->
+    <div class="program-container">
+        <h2>Q-Learning</h2>
+        <button class="copy-btn" onclick="copyCode('code7')">Copy Code</button>
+        <pre id="code7">import numpy as np
+import random
+
+env_states = 5
+env_actions = 2
+Q_table = np.zeros((env_states, env_actions))
+alpha = 0.1
+gamma = 0.9
+epsilon = 0.2
+
+def get_reward(state, action):
+    return random.choice([-1, 0, 1])
+
+def get_next_state(state, action):
+    return (state + action) % env_states
+
+for episode in range(100):
+    state = random.randint(0, env_states - 1)
+    for step in range(10):
+        if random.uniform(0, 1) < epsilon:
+            action = random.randint(0, env_actions - 1)
+        else:
+            action = np.argmax(Q_table[state])
+        reward = get_reward(state, action)
+        next_state = get_next_state(state, action)
+        Q_table[state, action] = Q_table[state, action] + alpha * (
+            reward + gamma * np.max(Q_table[next_state]) - Q_table[state, action]
+        )
+        state = next_state
+
+print("Final Q-Table:")
+print(Q_table)</pre>
+    </div>
+
+    <!-- Experiment 8 -->
+    <div class="program-container">
+        <h2>SVR</h2>
+        <button class="copy-btn" onclick="copyCode('code8')">Copy Code</button>
+        <pre id="code8">import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVR
+from sklearn.metrics import mean_squared_error, r2_score
+
+data = {
+    "Area": [1200, 1500, 800, 1100, 1600, 1000, 1400, 900],
+    "Location": ["Suburb", "City", "Village", "Suburb", "City", "Village", "City", "Suburb"],
+    "Bedrooms": [3, 4, 2, 3, 4, 2, 3, 2],
+    "Price": [250000, 400000, 150000, 300000, 420000, 180000, 390000, 210000]
+}
+
+df = pd.DataFrame(data)
+
+print("Columns:", list(df.columns))
+target = "Price"
+
+X = df.drop(columns=[target])
+y = df[target]
+
+X = pd.get_dummies(X)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+model = SVR()
+model.fit(X_train, y_train)
+
+print("\nEnter values for prediction:")
+
+area = float(input("Area (numeric): "))
+location = input("Location (City/Suburb/Village): ")
+bedrooms = int(input("Bedrooms (numeric): "))
+
+input_df = pd.DataFrame({
+    "Area": [area],
+    "Bedrooms": [bedrooms],
+    "Location": [location]
+})
+
+input_encoded = pd.get_dummies(input_df)
+input_encoded = input_encoded.reindex(columns=X.columns, fill_value=0)
+
+prediction = model.predict(input_encoded)
+print("\nPredicted Price:", prediction[0])
+
+y_pred = model.predict(X_test)
+print("Mean Squared Error:", mean_squared_error(y_test, y_pred))
+print("R2 Score:", r2_score(y_test, y_pred))</pre>
+    </div>
+
+    <!-- Experiment 9 -->
+    <div class="program-container">
+        <h2>SVC</h2>
+        <button class="copy-btn" onclick="copyCode('code9')">Copy Code</button>
+        <pre id="code9">import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import LabelEncoder
+
+data = {
+    "Age": ["Young", "Middle", "Old", "Middle", "Young", "Old", "Young", "Middle"],
+    "Salary": ["Low", "High", "High", "Medium", "Low", "Medium", "Low", "High"],
+    "Purchased": ["No", "Yes", "Yes", "Yes", "No", "Yes", "No", "Yes"]
+}
+df = pd.DataFrame(data)
+
+print("Columns:", list(df.columns))
+target = "Purchased"
+
+X = df.drop(columns=[target])
+y_raw = df[target]
+
+if y_raw.dtype == 'object' or y_raw.dtype.name == 'category':
+    le = LabelEncoder()
+    y = le.fit_transform(y_raw)
+else:
+    y = y_raw.values
+
+X = pd.get_dummies(X)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+model = SVC(kernel='linear')
+model.fit(X_train, y_train)
+
+print("\nEnter values for prediction:")
+age = input("Age (Young/Middle/Old): ")
+salary = input("Salary (Low/Medium/High): ")
+
+input_df = pd.DataFrame({'Age': [age], 'Salary': [salary]})
+input_encoded = pd.get_dummies(input_df)
+input_encoded = input_encoded.reindex(columns=X.columns, fill_value=0)
+
+prediction = model.predict(input_encoded)
+
+if y_raw.dtype == 'object' or y_raw.dtype.name == 'category':
+    pred_class = le.inverse_transform(prediction)
+    print("\nPrediction:", pred_class[0])
+else:
+    print("\nPrediction:", prediction[0])
+
+print("Accuracy on test set:", accuracy_score(y_test, model.predict(X_test)))
+
+# To try other kernels, replace the model initialization line with:
+# model = SVC(kernel='rbf')
+# or
+# model = SVC(kernel='poly')</pre>
+    </div>
+
+    <footer>
+        <p>Developed and Maintained by <span class="highlight">VIPER_RKO🐉&gt;&gt;&gt;</span></p>
+    </footer>
+
+    <script>
+        function copyCode(elementId) {
+            const codeElement = document.getElementById(elementId);
+            const range = document.createRange();
+            range.selectNode(codeElement);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            
+            try {
+                document.execCommand('copy');
+                selection.removeAllRanges();
+                
+                const btn = event.target;
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                alert('Failed to copy: ' + err);
+            }
+        }
+    </script>
+</body>
+</html>
